@@ -2,18 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/duaraghav8/netter/version"
+	dignet "github.com/duaraghav8/dignet/lib"
+	"github.com/duaraghav8/dignet/version"
 	"github.com/urfave/cli"
 	"os"
 )
 
-func listAvailableSubnets(c *cli.Context) error {
-	return nil
-}
-
 var cmdListAvailableSubnets = cli.Command{
-	Name:  "list-available-subnets",
-	Usage: "List available subnet CIDRs of given size in target VPC",
+	Name: "list-available-subnets",
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name:  "vpc-id",
@@ -22,9 +18,35 @@ var cmdListAvailableSubnets = cli.Command{
 		cli.Uint64Flag{
 			Name:  "subnet-size",
 			Usage: "Desired subnet size",
+			Value: 128,
 		},
 	},
 	Action: listAvailableSubnets,
+	Usage:  "List CIDRs of available IPv4 subnets of given size in target VPC",
+}
+
+func listAvailableSubnets(c *cli.Context) error {
+	config := &dignet.Config{
+		VpcID: c.String("vpc-id"),
+		Credentials: &dignet.AWSCredentials{
+			Profile:         c.GlobalString("profile"),
+			Region:          c.GlobalString("region"),
+			AccessKeyID:     c.GlobalString("access-key-id"),
+			SecretAccessKey: c.GlobalString("secret-access-key"),
+		},
+		SubnetSize: c.Uint64("subnet-size"),
+	}
+
+	subnets, err := dignet.FindAvailableSubnets(config)
+	if err != nil {
+		return err
+	}
+
+	for _, subnet := range subnets {
+		fmt.Println(subnet.String())
+	}
+
+	return nil
 }
 
 func main() {
@@ -65,7 +87,7 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to start %s: %s\n", version.Name, err.Error())
+		fmt.Fprintf(os.Stderr, "%s failed to start: %s\n", version.Name, err.Error())
 		os.Exit(1)
 	}
 }

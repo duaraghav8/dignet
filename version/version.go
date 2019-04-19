@@ -8,6 +8,6 @@ const (
 )
 
 var (
-	Name         = "Netter"
+	Name         = "Dignet"
 	HumanVersion = fmt.Sprintf("%s version %s", Name, Version)
 )
