@@ -7,15 +7,7 @@ It is useful when you want to determine one or more subnet CIDRs available for u
 Download the latest compiled binary for your platform from the [Releases](https://github.com/duaraghav8/dignet/releases) page.
 
 ## Library usage
-Download dignet using `go get https://github.com/duaraghav8/dignet`. Then import the library into your project and use it as described below:
+Download dignet using `go get https://github.com/duaraghav8/dignet`. See [examples/](https://github.com/duaraghav8/dignet/tree/master/examples) on how to use the library in your application.
 
-```go
-
-```
-
-## Credential Permissions
-The AWS credentials provided to Dignet should at least have the following IAM Permissions:
-
-```json
-
-```
+## Credentials
+The AWS credentials you supply must have the appropriate IAM permissions to [read VPC and subnet information](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_IAM.html#readonlyvpciam).

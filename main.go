@@ -36,7 +36,7 @@ func prettyPrint(res *dignet.FindAvailableSubnetsResponse) {
 
 	fmt.Printf("%s\n%d Available Subnets\n%s\n", sep, len(res.AvailableSubnets), sep)
 	for _, cidr := range res.AvailableSubnets {
-		fmt.Println(cidr)
+		fmt.Println(cidr.String())
 	}
 	fmt.Println()
 }

@@ -42,7 +42,9 @@ type (
 	}
 )
 
-func createSession(c *AWSCredentials) (*session.Session, error) {
+// createAWSSession creates a re-usable session object to use while
+// interacting with AWS
+func createAWSSession(c *AWSCredentials) (*session.Session, error) {
 	awsConf := aws.Config{}
 	if c.Region != "" {
 		awsConf.Region = aws.String(c.Region)
@@ -61,6 +63,8 @@ func createSession(c *AWSCredentials) (*session.Session, error) {
 	return nil, errors.New("No AWS credentials provided")
 }
 
+// getVPCCidr fetches the CIDR of the VPC whose ID and region are
+// provided
 func getVPCCidr(sess *session.Session, c *Config) (string, error) {
 	result, err := ec2.New(sess).DescribeVpcs(&ec2.DescribeVpcsInput{VpcIds: []*string{aws.String(c.VpcID)}})
 	if err != nil {
@@ -69,6 +73,8 @@ func getVPCCidr(sess *session.Session, c *Config) (string, error) {
 	return *result.Vpcs[0].CidrBlock, nil
 }
 
+// getExistingSubnetsFromVPC fetches CIDRs of subnets that already
+// exist inside the VPC
 func getExistingSubnetsFromVPC(sess *session.Session, c *Config) (*ec2.DescribeSubnetsOutput, error) {
 	input := &ec2.DescribeSubnetsInput{
 		Filters: []*ec2.Filter{
@@ -89,12 +95,13 @@ func extractCidrs(subnets *ec2.DescribeSubnetsOutput) []*net.IPNet {
 	return cidrBlocks
 }
 
-// FindAvailableSubnets queries the target VPC for existing subnets and returns
-// CIDRs of subnets of the specified size that are available for use
+// FindAvailableSubnets queries the target VPC for existing subnets
+// and returns CIDRs of subnets of the specified size that are
+// available for use
 func FindAvailableSubnets(c *Config) (*FindAvailableSubnetsResponse, error) {
 	var result []*net.IPNet
 
-	sess, err := createSession(c.Credentials)
+	sess, err := createAWSSession(c.Credentials)
 	if err != nil {
 		return nil, err
 	}
@@ -137,6 +144,13 @@ func FindAvailableSubnets(c *Config) (*FindAvailableSubnetsResponse, error) {
 			return nil, err
 		}
 
+		// The list of existing subnets can never overlap since AWS
+		// doesn't allow creating an overlapping subnet.
+		// Appending the candidate subnet to this list means that only
+		// this candidate can possibly introduce an overlap amongst all
+		// subnets in the list.
+		// Hence, if the entire list doesn't contain any overlaps, the
+		// candidate subnet is available for use.
 		if cidr.VerifyNoOverlap(append(existingSubnetCidrs, candidateSubnetCidr), parsedVpcCidr) == nil {
 			result = append(result, candidateSubnetCidr)
 		}
