@@ -56,8 +56,12 @@ func createAWSSession(c *AWSCredentials) (*session.Session, error) {
 	}
 
 	if c.Profile != "" {
-		return session.Must(
-			session.NewSessionWithOptions(session.Options{Config: awsConf, Profile: c.Profile})), nil
+		opts := session.Options{
+			Config:            awsConf,
+			Profile:           c.Profile,
+			SharedConfigState: session.SharedConfigEnable,
+		}
+		return session.Must(session.NewSessionWithOptions(opts)), nil
 	}
 
 	return nil, errors.New("No AWS credentials provided")

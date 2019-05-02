@@ -85,7 +85,6 @@ func main() {
 			Name:   "region",
 			Usage:  "AWS Region",
 			EnvVar: "AWS_REGION",
-			Value:  "us-east-1",
 		},
 		cli.StringFlag{
 			Name:   "access-key-id",
