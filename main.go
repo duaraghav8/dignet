@@ -6,6 +6,7 @@ import (
 	"github.com/duaraghav8/dignet/version"
 	"github.com/urfave/cli"
 	"os"
+	"strings"
 )
 
 var cmdListAvailableSubnets = cli.Command{
@@ -25,6 +26,21 @@ var cmdListAvailableSubnets = cli.Command{
 	Usage:  "List CIDRs of available IPv4 subnets of given size in target VPC",
 }
 
+func prettyPrint(res *dignet.FindAvailableSubnetsResponse) {
+	sep := strings.Repeat("=", 25)
+
+	fmt.Println()
+	fmt.Printf("Region:   %s\n", res.Region)
+	fmt.Printf("VPC ID:   %s\n", res.VpcID)
+	fmt.Printf("VPC CIDR: %s\n", res.VpcCidr)
+
+	fmt.Printf("%s\n%d Available Subnets\n%s\n", sep, len(res.AvailableSubnets), sep)
+	for _, cidr := range res.AvailableSubnets {
+		fmt.Println(cidr)
+	}
+	fmt.Println()
+}
+
 func listAvailableSubnets(c *cli.Context) error {
 	config := &dignet.Config{
 		VpcID: c.String("vpc-id"),
@@ -37,15 +53,12 @@ func listAvailableSubnets(c *cli.Context) error {
 		SubnetSize: c.Uint64("subnet-size"),
 	}
 
-	subnets, err := dignet.FindAvailableSubnets(config)
+	res, err := dignet.FindAvailableSubnets(config)
 	if err != nil {
 		return err
 	}
 
-	for _, subnet := range subnets {
-		fmt.Println(subnet.String())
-	}
-
+	prettyPrint(res)
 	return nil
 }
 

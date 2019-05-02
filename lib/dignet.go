@@ -31,6 +31,15 @@ type (
 		SubnetSize  uint64
 		Credentials *AWSCredentials
 	}
+
+	// FindAvailableSubnetsResponse contains the return value of
+	// FindAvailableSubnets()
+	FindAvailableSubnetsResponse struct {
+		Region           string
+		VpcID            string
+		VpcCidr          string
+		AvailableSubnets []*net.IPNet
+	}
 )
 
 func createSession(c *AWSCredentials) (*session.Session, error) {
@@ -82,7 +91,7 @@ func extractCidrs(subnets *ec2.DescribeSubnetsOutput) []*net.IPNet {
 
 // FindAvailableSubnets queries the target VPC for existing subnets and returns
 // CIDRs of subnets of the specified size that are available for use
-func FindAvailableSubnets(c *Config) ([]*net.IPNet, error) {
+func FindAvailableSubnets(c *Config) (*FindAvailableSubnetsResponse, error) {
 	var result []*net.IPNet
 
 	sess, err := createSession(c.Credentials)
@@ -133,5 +142,11 @@ func FindAvailableSubnets(c *Config) ([]*net.IPNet, error) {
 		}
 	}
 
-	return result, nil
+	response := &FindAvailableSubnetsResponse{
+		VpcID:            c.VpcID,
+		VpcCidr:          vpcCidr,
+		Region:           c.Credentials.Region,
+		AvailableSubnets: result,
+	}
+	return response, nil
 }
