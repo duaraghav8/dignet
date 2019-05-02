@@ -163,7 +163,7 @@ func FindAvailableSubnets(c *Config) (*FindAvailableSubnetsResponse, error) {
 	response := &FindAvailableSubnetsResponse{
 		VpcID:            c.VpcID,
 		VpcCidr:          vpcCidr,
-		Region:           c.Credentials.Region,
+		Region:           *sess.Config.Region,
 		AvailableSubnets: result,
 	}
 	return response, nil
