@@ -35,6 +35,7 @@ type (
 	// FindAvailableSubnetsResponse contains the return value of
 	// FindAvailableSubnets()
 	FindAvailableSubnetsResponse struct {
+		SubnetCapacity   uint64
 		Region           string
 		VpcID            string
 		VpcCidr          string
@@ -133,7 +134,7 @@ func FindAvailableSubnets(c *Config) (*FindAvailableSubnetsResponse, error) {
 	_, parsedVpcCidr, _ := net.ParseCIDR(vpcCidr)
 
 	if uint64(vpcFrozenBits) > subnetFrozenBits {
-		vpcSize := uint64(math.Pow(2, float64(32 - vpcFrozenBits)))
+		vpcSize := uint64(math.Pow(2, float64(32-vpcFrozenBits)))
 		return nil, errors.New(
 			fmt.Sprintf("Subnet size cannot be greater than VPC size (%d | %s)", vpcSize, vpcCidr))
 	}
@@ -162,8 +163,9 @@ func FindAvailableSubnets(c *Config) (*FindAvailableSubnetsResponse, error) {
 	response := &FindAvailableSubnetsResponse{
 		VpcID:            c.VpcID,
 		VpcCidr:          vpcCidr,
-		Region:           *sess.Config.Region,
 		AvailableSubnets: result,
+		Region:           *sess.Config.Region,
+		SubnetCapacity:   uint64(math.Pow(2, float64(32-subnetFrozenBits))),
 	}
 	return response, nil
 }

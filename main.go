@@ -27,14 +27,14 @@ var cmdListAvailableSubnets = cli.Command{
 }
 
 func prettyPrint(res *dignet.FindAvailableSubnetsResponse) {
-	sep := strings.Repeat("=", 25)
+	sep := strings.Repeat("=", 38)
 
 	fmt.Println()
 	fmt.Printf("Region:   %s\n", res.Region)
 	fmt.Printf("VPC ID:   %s\n", res.VpcID)
 	fmt.Printf("VPC CIDR: %s\n", res.VpcCidr)
 
-	fmt.Printf("%s\n%d Available Subnets\n%s\n", sep, len(res.AvailableSubnets), sep)
+	fmt.Printf("%s\n%d Available Subnet(s) of size %d\n%s\n", sep, len(res.AvailableSubnets), res.SubnetCapacity, sep)
 	for _, cidr := range res.AvailableSubnets {
 		fmt.Println(cidr.String())
 	}

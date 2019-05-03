@@ -35,9 +35,9 @@ If you've configured a [Named Profile](https://docs.aws.amazon.com/cli/latest/us
 
 Note that the region specified via the commandline overrides the region specified in profile.
 
-Use `-help` to get help on a particular command.
+Use `help <command>` to get help on a particular command.
 ```bash
-$ dignet list-available-subnets -help
+$ dignet help list-available-subnets
 NAME:
    dignet list-available-subnets - List CIDRs of available IPv4 subnets of given size in target VPC
 
@@ -51,22 +51,23 @@ OPTIONS:
 
 To get the list of Subnets available, use the `list-available-subnets` command.
 ```bash
-# Below command shows the list of subnets available that comprise of at least 4000 IPv4 addresses.
+# Below command shows the list of subnets available that comprise of 4000 IPv4 addresses.
+# Since the smallest subnet with at least 4K IPs is /20, dignet looks for all /20 subnets.
+
 $ dignet -profile production list-available-subnets -vpc-id vpc-07h38a995398gg203 -subnet-size 4000
 
 Region:   us-east-1
 VPC ID:   vpc-02h68a099382ff017
 VPC CIDR: 10.108.0.0/16
-=========================
-5 Available Subnets
-=========================
+===================================
+5 Available Subnet(s) of size 4096
+===================================
 10.108.64.0/20
 10.108.80.0/20
 10.108.96.0/20
 10.108.112.0/20
 10.108.128.0/20
 ...
-
 ```
 
 ## Library usage
