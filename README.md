@@ -60,7 +60,7 @@ Region:   us-east-1
 VPC ID:   vpc-02h68a099382ff017
 VPC CIDR: 10.108.0.0/16
 ===================================
-5 Available Subnet(s) of size 4096
+7 Available Subnet(s) of size 4096
 ===================================
 10.108.64.0/20
 10.108.80.0/20
@@ -71,7 +71,9 @@ VPC CIDR: 10.108.0.0/16
 ```
 
 ## Library usage
-Download dignet using `go get https://github.com/duaraghav8/dignet`. See [examples/](https://github.com/duaraghav8/dignet/tree/master/examples) on how to use the library in your application.
+Download dignet using `go get github.com/duaraghav8/dignet`.
+
+See [examples/](https://github.com/duaraghav8/dignet/tree/master/examples) on how to use the library in your application.
 
 ## Credentials
 The AWS credentials you supply must have the appropriate IAM permissions to [read VPC and subnet information](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_IAM.html#readonlyvpciam).
