@@ -128,19 +128,18 @@ func FindAvailableSubnets(c *Config) (*FindAvailableSubnetsResponse, error) {
 	}
 
 	existingSubnetCidrs := extractCidrs(subnets)
-	frozenBits := 32 - uint64(math.Ceil(math.Log2(float64(c.SubnetSize))))
+	subnetFrozenBits := 32 - uint64(math.Ceil(math.Log2(float64(c.SubnetSize))))
 	vpcFrozenBits, _ := strconv.Atoi(strings.Split(vpcCidr, "/")[1])
-	vpcSize := uint64(math.Pow(2, float64(vpcFrozenBits)))
 	_, parsedVpcCidr, _ := net.ParseCIDR(vpcCidr)
 
-	// This validation guarantees that frozenBits > vpcFrozenBits
-	if c.SubnetSize > vpcSize {
+	if uint64(vpcFrozenBits) > subnetFrozenBits {
+		vpcSize := uint64(math.Pow(2, float64(32 - vpcFrozenBits)))
 		return nil, errors.New(
 			fmt.Sprintf("Subnet size cannot be greater than VPC size (%d | %s)", vpcSize, vpcCidr))
 	}
 
-	newBits := frozenBits - uint64(vpcFrozenBits)
-	numOfSubnets := math.Pow(2, float64(frozenBits-uint64(vpcFrozenBits)))
+	newBits := subnetFrozenBits - uint64(vpcFrozenBits)
+	numOfSubnets := math.Pow(2, float64(subnetFrozenBits-uint64(vpcFrozenBits)))
 
 	for netNum := 0; netNum < int(numOfSubnets); netNum++ {
 		candidateSubnetCidr, err := cidr.Subnet(parsedVpcCidr, int(newBits), netNum)
